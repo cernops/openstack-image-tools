@@ -1,0 +1,80 @@
+<template>
+ <name>SLC6 CERN Server - x86_64</name>
+ <description>SLC6 Server with Cern-additions: AFS, Kerberos, user accounts, ...</description>
+ <os>
+  <name>SLC-6</name>
+  <version>4</version>
+  <arch>x86_64</arch>
+  <install type='iso'>
+    <iso>http://linuxsoft.cern.ch/cern/slc64/iso/SLC_6.4_x86_64_dvd.iso</iso>
+  </install>
+ </os>
+ <packages>
+  <package name='virt-what'/>
+  <package name='tuned'/>
+ </packages>
+ <commands>
+  <command name='grub'>
+exec >>/root/customize.log 2>&amp;1
+# Make sure the boot sequence is verbose
+[ -f /boot/grub/grub.conf ] &amp;&amp; /usr/bin/perl -ni -e "s/ rhgb//;s/ quiet//;print" /boot/grub/grub.conf || :
+[ -f /boot/grub2/grub.cfg ] &amp;&amp; /usr/bin/perl -ni -e "s/ rhgb//;s/ quiet//;print" /boot/grub2/grub.cfg || :
+  </command>
+  <command name='tuned'>
+exec >>/root/customize.log 2>&amp;1
+/usr/bin/tuned-adm profile virtual-guest || :
+  </command>
+  <command name='cern-private-cloud-addons'>
+exec >>/root/customize.log 2>&amp;1
+/usr/bin/yum install -y cern-config-users openafs-client cern-wrappers phonebook hepix cern-private-cloud-addons krb5-workstation
+/sbin/chkconfig --level 345 afs on
+:
+  </command>
+  <command name='de-contextualize'>
+exec >>/root/customize.log 2>&amp;1
+
+# delete udev rule for vNIC
+[ -e /etc/udev/rules.d/70-persistent-net.rules ] &amp;&amp; /bin/rm /etc/udev/rules.d/70-persistent-net.rules
+[ -e /lib/udev/write_net_rules ] &amp;&amp; /bin/rm /lib/udev/write_net_rules
+
+# remove references to MAC address, configure dhclient to persistently look for an IP address lease
+if [ -e /etc/sysconfig/network-scripts/ifcfg-eth0 ]; then
+    /usr/bin/perl -ni -e "print unless /^HWADDR=/" /etc/sysconfig/network-scripts/ifcfg-eth0
+    echo PERSISTENT_DHCLIENT=yes >> /etc/sysconfig/network-scripts/ifcfg-eth0
+fi
+
+set -v
+set -x
+
+# cloud-* rpms
+/usr/bin/yum install cloud-init -y --enablerepo=slc6-rhcommon
+
+if [ -e /etc/cloud/cloud.cfg ]; then
+    /bin/sed -i 's|cloud-user|root|' /etc/cloud/cloud.cfg
+    /bin/sed -i 's|^disable_root: 1|disable_root: 0|' /etc/cloud/cloud.cfg
+
+# XXXX cloud.cfg is missing the growpart module https://bugzilla.redhat.com/show_bug.cgi?id=966888
+
+fi
+
+/usr/bin/yum install cloud-utils dracut-modules-growroot -y
+
+# clean YUM repo's
+/usr/bin/yum clean all --enablerepo=*
+
+# remove and lock root password
+/usr/bin/passwd -d root || :
+/usr/bin/passwd -l root || :
+
+# roll logfiles
+/sbin/service rsyslog stop
+/usr/sbin/logrotate -f /etc/logrotate.conf
+:
+  </command>
+  <command name='clean-up'>
+# remove traces of the installation
+#/bin/rm -rf /root/{anaconda-ks.cfg,anaconda-post.log,customize.log,install.log,install.log.syslog}
+#/bin/rm -rf /var/log/*.1 /var/log/{yum.log,anaconda.syslog,anaconda.log} /tmp/ks-script-*
+  </command>
+ </commands>
+</template>

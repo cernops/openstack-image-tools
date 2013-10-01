@@ -1,0 +1,121 @@
+#! /usr/bin/perl -w
+use strict;
+use diagnostics;
+use Getopt::Long;
+
+my $usage = "Usage: $0 file.tdl\n";
+
+if (scalar(@ARGV) != 1){
+    print $usage;
+    exit 1;
+}
+
+my $os = lc(shift @ARGV);
+$os =~ s/\.tdl$//;
+if (not -e "$os.tdl"){
+    print $usage;
+    exit 1;
+}
+
+# useful variables
+
+my $landb_os = "UNKNOWN";
+my $image_format = my $hypervisor_type = undef;
+if ($os =~ /^slc6/){
+    $landb_os        = "LINUX";
+    $image_format    = "qcow2";
+    $hypervisor_type = "qemu";
+}elsif ($os =~ /^slc5/){
+    $landb_os        = "LINUX";
+    $image_format    = "qcow2";
+    $hypervisor_type = "qemu";
+}elsif ($os =~ /^f(18|17|16)/){
+    $landb_os        = "LINUX";
+    $image_format    = "qcow2";
+    $hypervisor_type = "qemu";
+}elsif ($os =~ /^w/){
+    $landb_os        = "WINDOWS";
+    $image_format    = "vhd";
+    $hypervisor_type = "hyperv";
+}
+
+#
+# Step 0: prepare the build machine
+#
+for my $cmd ("echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward",
+	     "sudo /usr/bin/virsh net-destroy default",
+	     "sudo /usr/bin/virsh net-start default",
+	     "sudo /usr/bin/virsh net-list --all"){
+    print "[INFO] Running \"$cmd\"\n";
+    system ($cmd) == 0 or exit $?;
+}
+
+
+
+#
+# Step 1: create the image
+#
+my $cmd = "sudo oz-install -d4 -u $os.tdl -x $os.xml -t 3600 -p";
+$cmd .= " -a $os.ks" if -e "$os.ks";
+
+print "[INFO] Running \"$cmd\"\n";
+system ($cmd) == 0 or exit $?;
+
+#
+# Step 2: convert it to qcow2 or vhd, and compress it
+#
+my $imagefile = undef;
+my $xmlfile = "$os.xml";
+if (not open(XML,$xmlfile)){
+    print STDERR "[ERROR] Cannot open \"$xmlfile\" for reading: $!\n";
+    exit 1;
+}
+while (<XML>){
+    chomp;
+    if (/^\s*<source file="(.*)\"\/>\s*$/){
+	$imagefile = quotemeta($1);
+	last;
+    }
+}
+close(XML);
+(my $outfile = $imagefile) =~ s/.dsk/.$image_format/;
+my $output_fmt = ($image_format eq "vhd" ? "vpc" : $image_format);
+$cmd = "sudo qemu-img convert -p -c -O $output_fmt $imagefile $outfile";
+print STDOUT "[INFO] Now running \"$cmd\"\n";
+system $cmd;
+
+#
+# Step 3: upload to Glance
+#
+
+
+print STDOUT "[INFO] Note: you can use \"guestfish\" to inspect the image:\n";
+print STDOUT "[INFO]        sudo guestfish --rw -a $outfile -i\n\n";
+
+# properties recognized by the ComputeFilter
+#  see http://docs.openstack.org/trunk/openstack-compute/admin/content/scheduler-filters.html
+my %property = (hypervisor_type => $hypervisor_type,
+		os              => $landb_os,
+    );
+my $imagename = $os;
+if (not open(TDL,"$os.tdl")){
+    print STDERR "[ERROR] Cannot open \"$os.tdl\" for reading: $!\n";
+    exit 1;
+}
+while (<TDL>){
+    chomp;
+    if (/^\s*<name>(.*)<\/name>\s*$/){
+	$imagename = $1;#quotemeta($1);
+	last;
+    }
+}
+close(TDL);
+my ($day,$mon,$year) = (localtime(time))[3,4,5];
+$imagename .= sprintf(" [%02d%02d%02d]",$year - 100,++$mon,$day);
+
+my $property = join(" ",map {sprintf "--property $_=\"$property{$_}\"" if defined $property{$_}} keys %property);
+my $glance = "glance image-create --name \"$imagename\" --container-format bare --disk-format $image_format $property --file $outfile";
+print STDOUT "[INFO] To upload the image, run sthg like \n   $glance\n\n";
+
+# done
+exit 0;
