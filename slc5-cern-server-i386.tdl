@@ -3,10 +3,10 @@
  <description>SLC5 Server with Cern-additions: AFS, Kerberos, user accounts, ...</description>
  <os>
   <name>SLC-5</name>
-  <version>U9</version>
+  <version>U10</version>
   <arch>i386</arch>
   <install type='iso'>
-    <iso>http://linuxsoft.cern.ch/cern/slc59/iso/SLC_5.9_i386_dvd.iso</iso>
+    <iso>http://linuxsoft.cern.ch/cern/slc510/iso/SLC_5.10_i386_dvd.iso</iso>
   </install>
  </os>
  <packages>
