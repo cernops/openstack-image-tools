@@ -1,7 +1,7 @@
 install
 
 # installation path, additional repositories
-url --url http://linuxsoft.cern.ch/cern/slc59/i386/
+url --url http://linuxsoft.cern.ch/cern/slc510/i386/
 
 repo --name="EPEL"             --baseurl http://linuxsoft.cern.ch/epel/5/i386
 repo --name="SLC5 - updates"   --baseurl http://linuxsoft.cern.ch/cern/slc5X/i386/yum/updates/
