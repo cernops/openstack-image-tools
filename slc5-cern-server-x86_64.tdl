@@ -16,14 +16,12 @@
  <commands>
   <command name='grub'>
 exec >>/root/customize.log 2>&amp;1
-echo grub snippet
 # Make sure the boot sequence is verbose
 [ -f /boot/grub/grub.conf ] &amp;&amp; /usr/bin/perl -ni -e "s/ rhgb//;s/ quiet//;print" /boot/grub/grub.conf || :
 [ -f /boot/grub2/grub.cfg ] &amp;&amp; /usr/bin/perl -ni -e "s/ rhgb//;s/ quiet//;print" /boot/grub2/grub.cfg || :
   </command>
   <command name='cloud-init-config'>
 exec >>/root/customize.log 2>&amp;1
-echo cloud-init-config snippet
 if [ -e /etc/cloud/cloud.cfg ]; then
     /bin/sed -i 's|ec2-user|root|' /etc/cloud/cloud.cfg
     /bin/sed -i 's|^disable_root: 1|disable_root: 0|' /etc/cloud/cloud.cfg
@@ -31,7 +29,6 @@ fi
   </command>
   <command name='cern-private-cloud-addons'>
 exec >>/root/customize.log 2>&amp;1
-echo cern-private-cloud-addons snippet
 /bin/rpm -qa kernel* --queryformat "%{version}-%{release}\n" | xargs -n1 -i{} /usr/bin/yum install -y kernel-module-openafs-{}
 /usr/bin/yum install -y cern-config-users openafs-client cern-wrappers phonebook hepix cern-private-cloud-addons
 /sbin/chkconfig --level 345 afs on
@@ -39,17 +36,6 @@ echo cern-private-cloud-addons snippet
   </command>
   <command name='de-contextualize'>
 exec >>/root/customize.log 2>&amp;1
-echo de-contextualize snippet
-
-# delete udev rule for vNIC
-[ -e /etc/udev/rules.d/70-persistent-net.rules ] &amp;&amp; /bin/rm /etc/udev/rules.d/70-persistent-net.rules
-[ -e /lib/udev/write_net_rules ] &amp;&amp; /bin/rm /lib/udev/write_net_rules
-
-# remove references to MAC address, configure dhclient to persistently look for an IP address lease
-if [ -e /etc/sysconfig/network-scripts/ifcfg-eth0 ]; then
-    /usr/bin/perl -ni -e "print unless /^HWADDR=/" /etc/sysconfig/network-scripts/ifcfg-eth0
-    echo PERSISTENT_DHCLIENT=yes >> /etc/sysconfig/network-scripts/ifcfg-eth0
-fi
 
 # clean YUM repo's
 /usr/bin/yum clean all --enablerepo=*
@@ -57,16 +43,7 @@ fi
 # remove and lock root password
 /usr/bin/passwd -d root || :
 /usr/bin/passwd -l root || :
-
-# roll logfiles
-/sbin/service rsyslog stop
-/usr/sbin/logrotate -f /etc/logrotate.conf
 :
-  </command>
-  <command name='clean-up'>
-# remove traces of the installation
-#/bin/rm -rf /root/{anaconda-ks.cfg,anaconda-post.log,customize.log,install.log,install.log.syslog}
-#/bin/rm -rf /var/log/*.1 /var/log/{yum.log,anaconda.syslog,anaconda.log} /tmp/ks-script-*
   </command>
  </commands>
 </template>

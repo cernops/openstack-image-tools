@@ -30,10 +30,10 @@ selinux --enforcing
 timezone --utc Europe/Zurich
 
 bootloader --location=mbr --append="console=ttyS0,115200 console=tty0"
-zerombr yes
+zerombr
 clearpart --all
 
-part /boot --size=200
+part /boot --size=400
 part pv.1  --size=1   --grow
 
 volgroup VolGroup00 --pesize=32768 pv.1

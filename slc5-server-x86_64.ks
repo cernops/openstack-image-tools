@@ -4,7 +4,7 @@ install
 url --url http://linuxsoft.cern.ch/cern/slc510/x86_64/
 
 repo --name="EPEL"             --baseurl http://linuxsoft.cern.ch/epel/5/x86_64
-repo --name="SLC5 - updates"   --baseurl http://linuxsoft.cern.ch/cern/slc5X/x86_64/yum/updates/
+#repo --name="SLC5 - updates"   --baseurl http://linuxsoft.cern.ch/cern/slc5X/x86_64/yum/updates/
 repo --name="SLC5 - extras"    --baseurl http://linuxsoft.cern.ch/cern/slc5X/x86_64/yum/extras/
 
 text
@@ -30,10 +30,10 @@ selinux --enforcing
 timezone --utc Europe/Zurich
 
 bootloader --location=mbr --append="console=ttyS0,115200 console=tty0"
-zerombr yes
+zerombr
 clearpart --all
 
-part /boot --size=200
+part /boot --size=400
 part pv.1  --size=1   --grow
 
 volgroup VolGroup00 --pesize=32768 pv.1

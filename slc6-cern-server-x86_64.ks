@@ -1,7 +1,7 @@
 install
 
 # installation path, additional repositories
-url --url http://linuxsoft.cern.ch/cern/slc63/x86_64/
+url --url http://linuxsoft.cern.ch/cern/slc65/x86_64/
 
 repo --name="EPEL"             --baseurl http://linuxsoft.cern.ch/epel/6/x86_64
 repo --name="SLC6 - updates"   --baseurl http://linuxsoft.cern.ch/cern/slc6X/x86_64/yum/updates/
@@ -31,10 +31,10 @@ timezone --utc Europe/Zurich
 logging --level=debug
 
 bootloader --location=mbr --append="console=ttyS0,115200 console=tty0"
-zerombr yes
+zerombr
 clearpart --all --initlabel
 
-part /boot --size=200
+part /boot --size=400
 part pv.1  --size=1   --grow
 
 volgroup VolGroup00 --pesize=32768 pv.1

@@ -3,7 +3,22 @@ use strict;
 use diagnostics;
 use Getopt::Long;
 
-my $usage = "Usage: $0 file.tdl\n";
+my $usage = "Usage: $0 [--debug] [-c oz-configuration-file] file.tdl\n";
+
+my $cfgfile = "/etc/oz/oz.cfg";
+my $debug = my $verbose = my $dryrun = 0;
+my %opts = (debug   => \$debug,
+	    dryrun  => \$dryrun,
+	    verbose => \$verbose);
+my $rc = Getopt::Long::GetOptions(\%opts,
+				  "debug","dryrun","verbose",
+				  "c=s" => \$cfgfile,
+    );
+if (not $rc){
+    print STDERR "Could not parse options\n";
+    exit 1;
+}
+$verbose = 1 if $debug;
 
 if (scalar(@ARGV) != 1){
     print $usage;
@@ -42,20 +57,23 @@ if ($os =~ /^slc6/){
 #
 # Step 0: prepare the build machine
 #
-for my $cmd ("echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward",
-	     "sudo /usr/bin/virsh net-destroy default",
-	     "sudo /usr/bin/virsh net-start default",
-	     "sudo /usr/bin/virsh net-list --all"){
-    print "[INFO] Running \"$cmd\"\n";
-    system ($cmd) == 0 or exit $?;
-}
+#for my $cmd ("echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward",
+#	     "sudo /usr/bin/virsh net-destroy default",
+#	     "sudo /usr/bin/virsh net-start default",
+#	     "sudo /usr/bin/virsh net-list --all"){
+##    print "[INFO] Running \"$cmd\"\n";
+##    system ($cmd) == 0 or exit $?;
+#}
 
 
 
 #
 # Step 1: create the image
 #
-my $cmd = "sudo oz-install -d4 -u $os.tdl -x $os.xml -t 3600 -p";
+my $dbglevel = 0;
+$dbglevel = 2 if $verbose;
+$dbglevel = 4 if $debug;
+my $cmd = "/usr/bin/oz-install -u $os.tdl -x $os.xml -t 3600 -p -c $cfgfile -d $dbglevel";
 $cmd .= " -a $os.ks" if -e "$os.ks";
 
 print "[INFO] Running \"$cmd\"\n";
@@ -80,17 +98,47 @@ while (<XML>){
 close(XML);
 (my $outfile = $imagefile) =~ s/.dsk/.$image_format/;
 my $output_fmt = ($image_format eq "vhd" ? "vpc" : $image_format);
-$cmd = "sudo qemu-img convert -p -c -O $output_fmt $imagefile $outfile";
+$cmd = "qemu-img convert -c -O $output_fmt $imagefile $outfile";
+$cmd .= " -p" if $verbose;
 print STDOUT "[INFO] Now running \"$cmd\"\n";
-system $cmd;
+system ($cmd) == 0 or exit $?;
 
 #
-# Step 3: upload to Glance
+# Step 3: de-contextualize the image
 #
+$cmd = "virt-sysprep --add $outfile";
+if ($debug){
+    $cmd .= " --verbose";
+}else{
+    $cmd .= " --quiet" unless $verbose;
+}
+print STDOUT "[INFO] Now running \"$cmd\"\n";
+system ($cmd) == 0 or exit $?;
 
+# A bit more cleanup, as virt-sysprep leaves a few things behind
+my $cleanup = join("\n",
+                   # https://bugzilla.redhat.com/show_bug.cgi?id=1039540
+		   "rm-rf /var/log/anaconda.syslog",
+		   "rm-rf /var/log/tuned/tuned.log",
+		   "rm-rf /root/anaconda-post.log",
+		   # Since virt-sysprep 1.24, /tmp, /var/tmp are emptied properly.
+		   "rm-rf /tmp/yum.log",
+		   "glob rm-rf /tmp/ks-script-*",
+		   # Added in virt-sysprep 1.24
+		   "glob rm-rf /var/log/sa/*",
+		   # CERN specific :)
+		   "rm-rf /root/customize.log",
+    );
+$cmd = "echo '$cleanup' | /usr/bin/guestfish --rw -i -a $outfile";
+print STDOUT "[INFO] Now running \"$cmd\"\n";
+system ($cmd) == 0 or exit $?;
 
 print STDOUT "[INFO] Note: you can use \"guestfish\" to inspect the image:\n";
-print STDOUT "[INFO]        sudo guestfish --rw -a $outfile -i\n\n";
+print STDOUT "[INFO]        guestfish --rw -i -a $outfile\n\n";
+
+#
+# Step 4: Prepare upload to Glance
+#
 
 # properties recognized by the ComputeFilter
 #  see http://docs.openstack.org/trunk/openstack-compute/admin/content/scheduler-filters.html
@@ -111,7 +159,7 @@ while (<TDL>){
 }
 close(TDL);
 my ($day,$mon,$year) = (localtime(time))[3,4,5];
-$imagename .= sprintf(" [%02d%02d%02d]",$year - 100,++$mon,$day);
+$imagename .= sprintf(" [%04d-%02d-%02d]",$year + 1900,++$mon,$day);
 
 my $property = join(" ",map {sprintf "--property $_=\"$property{$_}\"" if defined $property{$_}} keys %property);
 my $glance = "glance image-create --name \"$imagename\" --container-format bare --disk-format $image_format $property --file $outfile";
