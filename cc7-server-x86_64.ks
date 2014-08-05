@@ -9,10 +9,10 @@ url --url "http://linuxsoft.cern.ch/cern/centos/7/os/x86_64/"
 
 # Use network installation
 repo --name="EPEL" --baseurl="http://linuxsoft.cern.ch/epel/beta/7/x86_64" --cost=1
-#repo --name="CentOS-7 - Updates" --baseurl http://linuxsoft.cern.ch/cern/centos/7/updates/x86_64/
-#repo --name="CentOS-7 - Extras" --baseurl http://linuxsoft.cern.ch/cern/centos/7/extras/x86_64/
-#repo --name="CentOS-7 - CERN" --baseurl http://linuxsoft.cern.ch/cern/centos/7/cern/x86_64/
-#repo --name="CentOS-7 - CERNONLY" --baseurl http://linuxsoft.cern.ch/cern/centos/7/cernonly/x86_64/
+repo --name="CentOS-7 - Updates" --baseurl http://linuxsoft.cern.ch/cern/centos/7/updates/x86_64/
+repo --name="CentOS-7 - Extras" --baseurl http://linuxsoft.cern.ch/cern/centos/7/extras/x86_64/
+repo --name="CentOS-7 - CERN" --baseurl http://linuxsoft.cern.ch/cern/centos/7/cern/x86_64/
+repo --name="CentOS-7 - CERNONLY" --baseurl http://linuxsoft.cern.ch/cern/centos/7/cernonly/x86_64/
 
 text
 skipx
@@ -62,6 +62,9 @@ part / --fstype="xfs" --ondisk=vda --size=6144
 
 %post --erroronfail
 
+# Update the machine
+/usr/bin/yum update -y --skip-broken || :
+
 # workaround anaconda requirements
 passwd -d root
 passwd -l root
@@ -76,7 +79,7 @@ rootuuid=$( awk '$2=="/" { print $1 };'  /etc/fstab )
 mkdir /boot/grub
 echo -e 'default=0\ntimeout=0\n\n' > /boot/grub/grub.conf
 for kv in $( ls -1v /boot/vmlinuz* |grep -v rescue |sed s/.*vmlinuz-//  ); do
-  echo "title Red Hat Enterprise Linux 7 ($kv)" >> /boot/grub/grub.conf
+  echo "title CERN Centos Linux 7 ($kv)" >> /boot/grub/grub.conf
   echo -e "\troot (hd0)" >> /boot/grub/grub.conf
   echo -e "\tkernel /boot/vmlinuz-$kv ro root=$rootuuid console=hvc0 LANG=en_US.UTF-8" >> /boot/grub/grub.conf
   echo -e "\tinitrd /boot/initramfs-$kv.img" >> /boot/grub/grub.conf
@@ -162,12 +165,20 @@ EOL
 # make sure firstboot doesn't start
 echo "RUN_FIRSTBOOT=NO" > /etc/sysconfig/firstboot
 
+# Fixes for EPEL cloud-init
+if [ -e /etc/cloud/cloud.cfg ]; then
+    /bin/sed -i 's|name: fedora|name: cloud-user|' /etc/cloud/cloud.cfg
+    #FIXME /bin/sed -i 's|distro: fedora|cloud-user|' /etc/cloud/cloud.cfg
+    /bin/sed -i 's|Fedora|Centos|' /etc/cloud/cloud.cfg
+    /bin/sed -i 's|^disable_root: 1|disable_root: 0|' /etc/cloud/cloud.cfg
+fi
+
 # workaround https://bugzilla.redhat.com/show_bug.cgi?id=966888
 if ! grep -q growpart /etc/cloud/cloud.cfg; then
   sed -i 's/ - resizefs/ - growpart\n - resizefs/' /etc/cloud/cloud.cfg
 fi
 
-# allow sudo powers to cloud-user
+# FIXME (not needed with cloud-init from epel7) allow sudo powers to cloud-user
 echo -e 'cloud-user\tALL=(ALL)\tNOPASSWD: ALL' >> /etc/sudoers
 
 # Disable subscription-manager yum plugins
@@ -177,9 +188,9 @@ sed -i 's|^enabled=1|enabled=0|' /etc/yum/pluginconf.d/subscription-manager.conf
 echo "Cleaning old yum repodata."
 yum clean all
 
-# clean up installation logs"
+# clean up installation logs
 rm -rf /var/log/yum.log
-rm -rf /var/lib/yum/*
+rm -rf /var/lib/yum/* 
 rm -rf /root/install.log
 rm -rf /root/install.log.syslog
 rm -rf /root/anaconda-ks.cfg
