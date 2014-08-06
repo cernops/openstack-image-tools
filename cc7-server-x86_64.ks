@@ -4,16 +4,19 @@ auth --enableshadow --passalgo=sha512
 # Reboot after installation
 reboot
 
+# Use network installation
 # installation path, additional repositories
 url --url "http://linuxsoft.cern.ch/cern/centos/7/os/x86_64/"
 
-# Use network installation
+# EPEL needed from cloud-init (check if a rhcommon like repo will be available for 7)
 repo --name="EPEL" --baseurl="http://linuxsoft.cern.ch/epel/beta/7/x86_64" --cost=1
+
 repo --name="CentOS-7 - Updates" --baseurl http://linuxsoft.cern.ch/cern/centos/7/updates/x86_64/
 repo --name="CentOS-7 - Extras" --baseurl http://linuxsoft.cern.ch/cern/centos/7/extras/x86_64/
 repo --name="CentOS-7 - CERN" --baseurl http://linuxsoft.cern.ch/cern/centos/7/cern/x86_64/
 repo --name="CentOS-7 - CERNONLY" --baseurl http://linuxsoft.cern.ch/cern/centos/7/cernonly/x86_64/
 
+# No X, better debugging
 text
 skipx
 
@@ -168,7 +171,7 @@ echo "RUN_FIRSTBOOT=NO" > /etc/sysconfig/firstboot
 # Fixes for EPEL cloud-init
 if [ -e /etc/cloud/cloud.cfg ]; then
     /bin/sed -i 's|name: fedora|name: cloud-user|' /etc/cloud/cloud.cfg
-    #FIXME /bin/sed -i 's|distro: fedora|cloud-user|' /etc/cloud/cloud.cfg
+    /bin/sed -i 's|distro: fedora|distro: rhel|' /etc/cloud/cloud.cfg
     /bin/sed -i 's|Fedora|Centos|' /etc/cloud/cloud.cfg
     /bin/sed -i 's|^disable_root: 1|disable_root: 0|' /etc/cloud/cloud.cfg
 fi
