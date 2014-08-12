@@ -4,19 +4,16 @@ auth --enableshadow --passalgo=sha512
 # Reboot after installation
 reboot
 
-# Use network installation
 # installation path, additional repositories
 url --url "http://linuxsoft.cern.ch/cern/centos/7/os/x86_64/"
 
-# EPEL needed from cloud-init (check if a rhcommon like repo will be available for 7)
+# Use network installation
 repo --name="EPEL" --baseurl="http://linuxsoft.cern.ch/epel/beta/7/x86_64" --cost=1
-
 repo --name="CentOS-7 - Updates" --baseurl http://linuxsoft.cern.ch/cern/centos/7/updates/x86_64/
 repo --name="CentOS-7 - Extras" --baseurl http://linuxsoft.cern.ch/cern/centos/7/extras/x86_64/
 repo --name="CentOS-7 - CERN" --baseurl http://linuxsoft.cern.ch/cern/centos/7/cern/x86_64/
 repo --name="CentOS-7 - CERNONLY" --baseurl http://linuxsoft.cern.ch/cern/centos/7/cernonly/x86_64/
 
-# No X, better debugging
 text
 skipx
 
@@ -143,12 +140,12 @@ EOF
 echo "virtual-guest" > /etc/tuned/active_profile
 
 # generic localhost names
-# cat > /etc/hosts << EOF
+#cat > /etc/hosts << EOF
 #127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 #::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 #
 #EOF
-echo .
+#echo .
 
 # Because memory is scarce resource in most cloud/virt environments,
 # and because this impedes forensics, we are differing from the Fedora
@@ -168,7 +165,12 @@ EOL
 # make sure firstboot doesn't start
 echo "RUN_FIRSTBOOT=NO" > /etc/sysconfig/firstboot
 
-# Fixes for EPEL cloud-init
+# Fixes for EPEL cloud-init.
+
+# Ugly hack: detect CentOS as a systemd target.
+if [ -e /usr/lib/python2.7/site-packages/cloudinit/distros/rhel.py ]; then
+    /bin/sed -i 's|Red Hat Enterprise Linux|CentOS Linux|' /usr/lib/python2.7/site-packages/cloudinit/distros/rhel.py 	
+fi
 if [ -e /etc/cloud/cloud.cfg ]; then
     /bin/sed -i 's|name: fedora|name: cloud-user|' /etc/cloud/cloud.cfg
     /bin/sed -i 's|distro: fedora|distro: rhel|' /etc/cloud/cloud.cfg
