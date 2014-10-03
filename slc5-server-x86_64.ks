@@ -49,6 +49,7 @@ reboot
 -yum-autoupdate
 yum-protectbase
 yum-priorities
+yum-kernel-module
 ntp
 zsh
 
