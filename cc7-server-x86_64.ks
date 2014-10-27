@@ -8,9 +8,9 @@ reboot
 url --url "http://linuxsoft.cern.ch/cern/centos/7/os/x86_64/"
 
 # Use network installation
-repo --name="EPEL" --baseurl="http://linuxsoft.cern.ch/epel/beta/7/x86_64" --cost=1
+# repo --name="EPEL" --baseurl="http://linuxsoft.cern.ch/epel/7/x86_64" --cost=1
+repo --name="CentOS-7 - Extras" --baseurl http://linuxsoft.cern.ch/cern/centos/7/extras/x86_64/ --cost=1
 repo --name="CentOS-7 - Updates" --baseurl http://linuxsoft.cern.ch/cern/centos/7/updates/x86_64/
-repo --name="CentOS-7 - Extras" --baseurl http://linuxsoft.cern.ch/cern/centos/7/extras/x86_64/
 repo --name="CentOS-7 - CERN" --baseurl http://linuxsoft.cern.ch/cern/centos/7/cern/x86_64/
 repo --name="CentOS-7 - CERNONLY" --baseurl http://linuxsoft.cern.ch/cern/centos/7/cernonly/x86_64/
 
@@ -64,6 +64,7 @@ part / --fstype="xfs" --ondisk=vda --size=6144
 
 # Update the machine
 /usr/bin/yum update -y --skip-broken || :
+/usr/bin/yum install -y cloud-init cloud-utils-growpart || :
 
 # workaround anaconda requirements
 passwd -d root
@@ -168,13 +169,14 @@ echo "RUN_FIRSTBOOT=NO" > /etc/sysconfig/firstboot
 # Fixes for EPEL cloud-init.
 
 # Ugly hack: detect CentOS as a systemd target.
-if [ -e /usr/lib/python2.7/site-packages/cloudinit/distros/rhel.py ]; then
-    /bin/sed -i 's|Red Hat Enterprise Linux|CentOS Linux|' /usr/lib/python2.7/site-packages/cloudinit/distros/rhel.py 	
-fi
+# if [ -e /usr/lib/python2.7/site-packages/cloudinit/distros/rhel.py ]; then
+#    /bin/sed -i 's|Red Hat Enterprise Linux|CentOS Linux|' /usr/lib/python2.7/site-packages/cloudinit/distros/rhel.py 	
+#fi
+
 if [ -e /etc/cloud/cloud.cfg ]; then
-    /bin/sed -i 's|name: fedora|name: cloud-user|' /etc/cloud/cloud.cfg
-    /bin/sed -i 's|distro: fedora|distro: rhel|' /etc/cloud/cloud.cfg
-    /bin/sed -i 's|Fedora|Centos|' /etc/cloud/cloud.cfg
+    #/bin/sed -i 's|name: fedora|name: cloud-user|' /etc/cloud/cloud.cfg
+    #/bin/sed -i 's|distro: fedora|distro: rhel|' /etc/cloud/cloud.cfg
+    #/bin/sed -i 's|Fedora|Centos|' /etc/cloud/cloud.cfg
     /bin/sed -i 's|^disable_root: 1|disable_root: 0|' /etc/cloud/cloud.cfg
 fi
 
@@ -214,8 +216,6 @@ sed -i 's/console=tty0/console=tty0 console=ttyS0,115200n8/' /boot/grub2/grub.cf
 %packages
 @core
 chrony
-cloud-init
-cloud-utils-growpart
 dracut-config-generic
 dracut-norescue
 firewalld
