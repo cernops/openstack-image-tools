@@ -1,7 +1,7 @@
 install
 
 # installation path, additional repositories
-url --url http://linuxsoft.cern.ch/cern/slc510/x86_64/
+url --url http://linuxsoft.cern.ch/cern/slc511/x86_64/
 
 repo --name="EPEL"             --baseurl http://linuxsoft.cern.ch/epel/5/x86_64
 #repo --name="SLC5 - updates"   --baseurl http://linuxsoft.cern.ch/cern/slc5X/x86_64/yum/updates/
@@ -49,6 +49,7 @@ reboot
 -yum-autoupdate
 yum-protectbase
 yum-priorities
+yum-kernel-module
 ntp
 zsh
 

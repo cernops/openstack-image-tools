@@ -10,6 +10,7 @@
   </install>
  </os>
  <packages>
+  <package name='heat-cfntools'/>
   <package name='virt-what'/>
   <package name='tuned'/>
  </packages>

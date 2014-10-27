@@ -3,10 +3,10 @@
  <description>SLC5 Server - x86_64</description>
  <os>
   <name>SLC-5</name>
-  <version>U10</version>
+  <version>U11</version>
   <arch>x86_64</arch>
   <install type='iso'>
-    <iso>http://linuxsoft.cern.ch/cern/slc510/iso/SLC_5.10_x86_64_dvd.iso</iso>
+    <iso>http://linuxsoft.cern.ch/cern/slc511/iso/SLC_5.11_x86_64_dvd.iso</iso>
   </install>
  </os>
  <packages>
