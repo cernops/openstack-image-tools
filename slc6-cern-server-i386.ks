@@ -1,12 +1,12 @@
 install
 
 # installation path, additional repositories
-url --url http://linuxsoft.cern.ch/cern/slc65/i386/
+url --url http://linuxsoft.cern.ch/cern/slc66/i386/
 
 repo --name="EPEL"             --baseurl http://linuxsoft.cern.ch/epel/6/i386
-repo --name="SLC6 - updates"   --baseurl http://linuxsoft.cern.ch/cern/slc6X/i386/yum/updates/
-repo --name="SLC6 - extras"    --baseurl http://linuxsoft.cern.ch/cern/slc6X/i386/yum/extras/
-repo --name="SLC6 - cernonly"  --baseurl http://linuxsoft.cern.ch/onlycern/slc6X/i386/yum/cernonly/
+repo --name="SLC6 - updates"   --baseurl http://linuxsoft.cern.ch/cern/slc66/i386/yum/updates/
+repo --name="SLC6 - extras"    --baseurl http://linuxsoft.cern.ch/cern/slc66/i386/yum/extras/
+#repo --name="SLC6 - cernonly"  --baseurl http://linuxsoft.cern.ch/onlycern/slc66/i386/yum/cernonly/
 
 text
 key --skip
@@ -65,15 +65,6 @@ yum-plugin-priorities
 
 /usr/bin/logger "Starting anaconda postinstall"
 
-## redirect the output to the log file
-#exec >/root/anaconda-post.log 2>&1
-#
-## show the output on the seventh console
-#tail -f /root/anaconda-post.log >/dev/tty7 &
-#
-## changing to VT 7 that we can see what's going on....
-#/usr/bin/chvt 7
-
 set -x 
 
 #
@@ -87,9 +78,5 @@ set -x
 
 # The net.bridge.* entries in /etc/sysctl.conf make "sysctl -p" fail if "bridge" module is not loaded...
 /usr/bin/perl -ni -e '$_ = "### Commented out by CERN... $_" if /^net\.bridge/;print' /etc/sysctl.conf || :
-
-# create ec2-user
-#/usr/sbin/useradd ec2-user
-#/bin/echo -e 'ec2-user\tALL=(ALL)\tNOPASSWD: ALL' >> /etc/sudoers
 
 %end
