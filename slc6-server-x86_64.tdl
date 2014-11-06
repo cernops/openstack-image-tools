@@ -3,10 +3,10 @@
  <description>SLC6 Server - x86_64</description>
  <os>
   <name>SLC-6</name>
-  <version>5</version>
+  <version>6</version>
   <arch>x86_64</arch>
-  <install type='iso'>
-    <iso>http://linuxsoft.cern.ch/cern/slc65/iso/SLC_6.5_x86_64_dvd.iso</iso>
+  <install type='url'>
+    <url>http://linuxsoft.cern.ch/cern/slc66/x86_64/</url>
   </install>
  </os>
  <packages>
@@ -28,8 +28,10 @@ exec >>/root/customize.log 2>&amp;1
   <command name='de-contextualize'>
 exec >>/root/customize.log 2>&amp;1
 
-# cloud-* rpms
-/usr/bin/yum install cloud-init -y --enablerepo=slc6-rhcommon
+#
+# Install cloud-init and friends
+#
+/usr/bin/yum install cloud-init -y
 
 if [ -e /etc/cloud/cloud.cfg ]; then
     /bin/sed -i 's|cloud-user|root|' /etc/cloud/cloud.cfg
@@ -48,10 +50,14 @@ fi
 #
 echo DHCPV6C=\"yes\" >> /etc/sysconfig/network-scripts/ifcfg-eth0
 
+#
 # clean YUM repo's
+#
 /usr/bin/yum clean all --enablerepo=*
 
-# remove and lock root password
+#
+# Remove and lock root password
+#
 /usr/bin/passwd -d root || :
 /usr/bin/passwd -l root || :
 :
