@@ -125,14 +125,14 @@ my $cleanup = join("\n",
 		   "rm-rf /var/log/anaconda.syslog",
 		   "rm-rf /var/log/tuned/tuned.log",
 		   "rm-rf /root/anaconda-post.log",
-		   # Since virt-sysprep 1.24, /tmp, /var/tmp are emptied properly.
-		   "rm-rf /tmp/yum.log",
-		   "glob rm-rf /tmp/ks-script-*",
-		   # Added in virt-sysprep 1.24
-		   "glob rm-rf /var/log/sa/*",
 		   # CERN specific :)
 		   "rm-rf /root/customize.log",
     );
+$cleanup = join("\n",
+		"cat /root/customize.log",
+		"cat /root/anaconda-post.log",
+		$cleanup) if $verbose;
+
 $cmd = "echo '$cleanup' | /usr/bin/guestfish --rw -i -a $outfile";
 print STDOUT "[INFO] Now running \"$cmd\"\n";
 system ($cmd) == 0 or exit $?;
