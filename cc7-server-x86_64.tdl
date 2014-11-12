@@ -11,17 +11,31 @@
  </os>
  <commands>
   <command name='fixes'>
+#
 # de-Quattorize
+#
 /usr/bin/yum erase ncm-ncd perl-AppConfig-caf perl-LC -y
 
+#
 # Puppeteers will configure updates themselves
+#
 /usr/bin/yum erase yum-autoupdate -y
 
-# heat-cfntools
+#
+# Quiesce logrotate
+#
+/usr/bin/touch /var/log/spooler
+
+#
+# Install heat-cfntools
+#
 /usr/bin/yum install heat-cfntools -y || :
 
+#
 # Enable DHCPv6 for eth0
+#
 echo DHCPV6C=\"yes\" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+
   </command>
  </commands>
 </template>
