@@ -59,19 +59,6 @@ if ($os =~ /^slc6/){
 }
 
 #
-# Step 0: prepare the build machine
-#
-#for my $cmd ("echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward",
-#	     "sudo /usr/bin/virsh net-destroy default",
-#	     "sudo /usr/bin/virsh net-start default",
-#	     "sudo /usr/bin/virsh net-list --all"){
-##    print "[INFO] Running \"$cmd\"\n";
-##    system ($cmd) == 0 or exit $?;
-#}
-
-
-
-#
 # Step 1: create the image
 #
 my $dbglevel = 0;
@@ -122,15 +109,15 @@ system ($cmd) == 0 or exit $?;
 # A bit more cleanup, as virt-sysprep leaves a few things behind
 my $cleanup = join("\n",
                    # https://bugzilla.redhat.com/show_bug.cgi?id=1039540
-		   "rm-rf /var/log/anaconda.syslog",
-		   "rm-rf /var/log/tuned/tuned.log",
-		   "rm-rf /root/anaconda-post.log",
+		   "-rm-rf /var/log/anaconda.syslog",
+		   "-rm-rf /var/log/tuned/tuned.log",
+		   "-rm-rf /root/anaconda-post.log",
 		   # CERN specific :)
-		   "rm-rf /root/customize.log",
+		   "-rm-rf /root/customize.log",
     );
 $cleanup = join("\n",
-		"cat /root/customize.log",
-		"cat /root/anaconda-post.log",
+		"-cat /root/anaconda-post.log",
+		"-cat /root/customize.log",
 		$cleanup) if $verbose;
 
 $cmd = "echo '$cleanup' | /usr/bin/guestfish --rw -i -a $outfile";
@@ -148,6 +135,7 @@ print STDOUT "[INFO]        guestfish --rw -i -a $outfile\n\n";
 #  see http://docs.openstack.org/trunk/openstack-compute/admin/content/scheduler-filters.html
 my %property = (hypervisor_type => $hypervisor_type,
 		os              => $landb_os,
+		owner           => "1ba03dae-e7f9-4b1f-afb3-ba9429d45c67", # Cloud Infra Services
     );
 my $imagename = $os;
 if (not open(TDL,"$os.tdl")){
