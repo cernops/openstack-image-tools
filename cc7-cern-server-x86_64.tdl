@@ -1,0 +1,46 @@
+<template>
+ <name>CC7 CERN Server - x86_64</name>
+ <description>CC7 Server with Cern-additions: AFS, Kerberos, user accounts, ...</description>
+ <os>
+  <name>CentOS-7</name>
+  <version>0</version>
+  <arch>x86_64</arch>
+  <install type='url'>
+    <url>http://linuxsoft.cern.ch/cern/centos/7/os/x86_64/</url>
+  </install>
+ </os>
+ <commands>
+  <command name='customizations'>
+
+exec >>/root/customize.log 2>&amp;1
+
+/usr/bin/yum groupinstall 'CERN Base Tools' -y
+
+/bin/rpm -qa kernel* --queryformat "%{version}_%{release}\n" | /bin/sort | /usr/bin/uniq | /usr/bin/xargs -n1 -i{} /usr/bin/yum install kmod-openafs-*.{} -y
+
+/usr/bin/yum install -y cern-config-users openafs-client cern-wrappers phonebook hepix cern-private-cloud-addons krb5-workstation
+
+/usr/bin/systemctl enable openafs-client.service
+
+/usr/bin/yum install -y ntp # necessary to make ncm-srvtab work
+
+/usr/bin/yum erase lcm-profile -y # remove from image, let instance put it back *with correct link for /usr/share/lcm/profile_standalone.xml*
+
+#
+# Quiesce logrotate
+#
+/usr/bin/touch /var/log/spooler
+
+#
+# Install heat-cfntools
+#
+/usr/bin/yum install heat-cfntools -y || :
+
+#
+# Enable DHCPv6 for eth0
+#
+echo DHCPV6C=\"yes\" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+
+  </command>
+ </commands>
+</template>
