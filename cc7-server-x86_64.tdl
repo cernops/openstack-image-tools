@@ -22,9 +22,9 @@
 /usr/bin/yum erase yum-autoupdate -y
 
 #
-# Quiesce logrotate
+# Quiesce logrotate (BZ 1144465)
 #
-/usr/bin/touch /var/log/spooler
+/bin/sed -i 's|sharedscripts|sharedscripts\n    missingok|' /etc/logrotate.d/syslog
 
 #
 # Install heat-cfntools
