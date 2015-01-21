@@ -8,6 +8,7 @@
   <install type='url'>
     <url>http://linuxsoft.cern.ch/cern/centos/7/os/x86_64/</url>
   </install>
+  <kernelparam>geoloc=0</kernelparam>
  </os>
  <commands>
   <command name='customizations'>
