@@ -36,26 +36,29 @@ if (not -e "$os.tdl"){
 
 my $landb_os = "UNKNOWN";
 my $image_format = my $hypervisor_type = undef;
-if ($os =~ /^slc6/){
+if ($os =~ /^(rhel|slc)(5|6)/ or $os =~ /^(rhel|cc)7/){
     $landb_os        = "LINUX";
     $image_format    = "qcow2";
     $hypervisor_type = "qemu";
-}elsif ($os =~ /^cc7/){
-    $landb_os        = "LINUX";
-    $image_format    = "qcow2";
-    $hypervisor_type = "qemu";
-}elsif ($os =~ /^slc5/){
-    $landb_os        = "LINUX";
-    $image_format    = "qcow2";
-    $hypervisor_type = "qemu";
-}elsif ($os =~ /^f(18|17|16)/){
-    $landb_os        = "LINUX";
-    $image_format    = "qcow2";
-    $hypervisor_type = "qemu";
+#}elsif ($os =~ /^cc7/){
+#    $landb_os        = "LINUX";
+#    $image_format    = "qcow2";
+#    $hypervisor_type = "qemu";
+#}elsif ($os =~ /^slc5/){
+#    $landb_os        = "LINUX";
+#    $image_format    = "qcow2";
+#    $hypervisor_type = "qemu";
+#}elsif ($os =~ /^f(18|17|16)/){
+#    $landb_os        = "LINUX";
+#    $image_format    = "qcow2";
+#    $hypervisor_type = "qemu";
 }elsif ($os =~ /^w/){
     $landb_os        = "WINDOWS";
     $image_format    = "vhd";
     $hypervisor_type = "hyperv";
+}else{
+    print STDERR "[ERROR] Cannot determine Operating System version from TDL file name \"$os.tdl\"\n";
+    exit 1;
 }
 
 #
@@ -68,7 +71,7 @@ my $cmd = "/usr/bin/oz-install -u $os.tdl -x $os.xml -t 3600 -p -c $cfgfile -d $
 $cmd .= " -a $os.ks" if -e "$os.ks";
 
 print "[INFO] Running \"$cmd\"\n";
-system ($cmd) == 0 or exit $?;
+system ($cmd) == 0 or exit $? >> 8;
 
 #
 # Step 2: convert it to qcow2 or vhd, and compress it
@@ -92,7 +95,7 @@ my $output_fmt = ($image_format eq "vhd" ? "vpc" : $image_format);
 $cmd = "qemu-img convert -c -O $output_fmt $imagefile $outfile";
 $cmd .= " -p" if $verbose;
 print STDOUT "[INFO] Now running \"$cmd\"\n";
-system ($cmd) == 0 or exit $?;
+system ($cmd) == 0 or exit $? >> 8;
 
 #
 # Step 3: de-contextualize the image
@@ -104,7 +107,7 @@ if ($debug){
     $cmd .= " --quiet" unless $verbose;
 }
 print STDOUT "[INFO] Now running \"$cmd\"\n";
-system ($cmd) == 0 or exit $?;
+system ($cmd) == 0 or exit $? >> 8;
 
 # A bit more cleanup, as virt-sysprep leaves a few things behind
 my $cleanup = join("\n",
@@ -122,7 +125,7 @@ $cleanup = join("\n",
 
 $cmd = "echo '$cleanup' | /usr/bin/guestfish --rw -i -a $outfile";
 print STDOUT "[INFO] Now running \"$cmd\"\n";
-system ($cmd) == 0 or exit $?;
+system ($cmd) == 0 or exit $? >> 8;
 
 print STDOUT "[INFO] Note: you can use \"guestfish\" to inspect the image:\n";
 print STDOUT "[INFO]        guestfish --rw -i -a $outfile\n\n";
@@ -135,7 +138,6 @@ print STDOUT "[INFO]        guestfish --rw -i -a $outfile\n\n";
 #  see http://docs.openstack.org/trunk/openstack-compute/admin/content/scheduler-filters.html
 my %property = (hypervisor_type => $hypervisor_type,
 		os              => $landb_os,
-		owner           => "1ba03dae-e7f9-4b1f-afb3-ba9429d45c67", # Cloud Infra Services
     );
 my $imagename = $os;
 if (not open(TDL,"$os.tdl")){
@@ -154,7 +156,8 @@ my ($day,$mon,$year) = (localtime(time))[3,4,5];
 $imagename .= sprintf(" [%04d-%02d-%02d]",$year + 1900,++$mon,$day);
 
 my $property = join(" ",map {sprintf "--property $_=\"$property{$_}\"" if defined $property{$_}} keys %property);
-my $glance = "glance image-create --name \"$imagename\" --container-format bare --disk-format $image_format $property --file $outfile";
+my $owner = "1ba03dae-e7f9-4b1f-afb3-ba9429d45c67"; # Cloud Infra Services
+my $glance = "glance image-create --name \"$imagename\" --container-format bare --disk-format $image_format $property --owner $owner --is-public False --file $outfile";
 print STDOUT "[INFO] To upload the image, run sthg like \n   $glance\n\n";
 
 # done
