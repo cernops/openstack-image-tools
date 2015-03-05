@@ -1,0 +1,50 @@
+<template>
+ <name>RHEL5 Server - x86_64</name>
+ <description>RHEL5 Server - x86_64</description>
+ <os>
+  <name>RHEL-5</name>
+  <version>U11</version>
+  <arch>x86_64</arch>
+  <install type='url'>
+    <url>http://linuxsoft.cern.ch/enterprise/5Server_U11/en/os/x86_64</url>
+  </install>
+ </os>
+ <repositories>
+  <repository name='epel-5'>
+   <url>http://linuxsoft.cern.ch/epel/5/x86_64</url>
+  </repository>
+  <repository name='rhel5-updates'>
+   <url>http://linuxsoft.cern.ch/rhel/rhel5server-x86_64/RPMS.updates/</url>
+  </repository>
+ </repositories>
+ <packages>
+  <package name='cloud-init'/>
+  <package name='virt-what'/>
+ </packages>
+ <commands>
+  <command name='grub'>
+exec >>/root/customize.log 2>&amp;1
+# Make sure the boot sequence is verbose
+[ -f /boot/grub/grub.conf ] &amp;&amp; /usr/bin/perl -ni -e "s/ rhgb//;s/ quiet//;print" /boot/grub/grub.conf || :
+[ -f /boot/grub2/grub.cfg ] &amp;&amp; /usr/bin/perl -ni -e "s/ rhgb//;s/ quiet//;print" /boot/grub2/grub.cfg || :
+  </command>
+  <command name='cloud-init-config'>
+exec >>/root/customize.log 2>&amp;1
+if [ -e /etc/cloud/cloud.cfg ]; then
+    /bin/sed -i 's|ec2-user|root|' /etc/cloud/cloud.cfg
+    /bin/sed -i 's|^disable_root: 1|disable_root: 0|' /etc/cloud/cloud.cfg
+fi
+  </command>
+  <command name='de-contextualize'>
+exec >>/root/customize.log 2>&amp;1
+
+# clean YUM repo's
+/usr/bin/yum clean all --enablerepo=*
+
+# remove and lock root password
+/usr/bin/passwd -d root || :
+/usr/bin/passwd -l root || :
+:
+  </command>
+ </commands>
+</template>
