@@ -31,7 +31,7 @@ exec >>/root/customize.log 2>&amp;1
 #
 # Install cloud-init and friends
 #
-/usr/bin/yum install cloud-init -y
+/usr/bin/yum install cloud-init -y --enablerepo=slc6-rhcommon
 
 if [ -e /etc/cloud/cloud.cfg ]; then
     /bin/sed -i 's|cloud-user|root|' /etc/cloud/cloud.cfg
