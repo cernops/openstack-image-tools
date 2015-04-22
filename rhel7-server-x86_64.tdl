@@ -6,7 +6,7 @@
   <version>7</version>
   <arch>x86_64</arch>
   <install type='url'>
-    <url>http://linuxsoft.cern.ch/enterprise/7Server_U0/en/os/x86_64</url>
+    <url>http://linuxsoft.cern.ch/enterprise/7Server_U1/en/os/x86_64</url>
   </install>
   <kernelparam>inst.geoloc=0</kernelparam>
  </os>
@@ -15,11 +15,9 @@
     <url>http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/extras/os</url>
   </repository>
  </repositories>
- <packages>
-  <package name='heat-cfntools'/>
-  <package name='virt-what'/>
-  <package name='tuned'/>
- </packages>
+# <packages>
+#  <package name='heat-cfntools'/>
+# </packages>
  <commands>
   <command name='fixes'>
 #

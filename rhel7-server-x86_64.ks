@@ -5,13 +5,19 @@ auth --enableshadow --passalgo=sha512
 reboot
 
 # installation path, additional repositories
-url --url http://linuxsoft.cern.ch/enterprise/7Server_U0/en/os/x86_64
+url --url http://linuxsoft.cern.ch/enterprise/7Server_U1/en/os/x86_64
 
 # Use network installation
+repo --name="extras"         --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/extras/os
+repo --name="supplementary"  --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/supplementary/os
+repo --name="optional"       --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/optional/os
+repo --name="common"         --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/rh-common/os
+
 # repo --name="EPEL" --baseurl="http://linuxsoft.cern.ch/epel/7/x86_64" --cost=1
-repo --name="RHEL7 - Extras"    --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/extras/os --cost=1
-repo --name="RHEL7 - Fastrack"  --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/fastrack/rhel/server/7/x86_64/os
-repo --name="RHEL7 - RH Common" --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/rh-common/os
+#repo --name="RHEL7 - Optional"    --baseurl http://linuxsoft.cern.ch/rhel/rhel7server-x86_64/RPMS.optional/ --cost=1
+###repo --name="RHEL7 - Extras"    --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/extras/os --cost=1
+###repo --name="RHEL7 - Fastrack"  --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/fastrack/rhel/server/7/x86_64/os
+###repo --name="RHEL7 - RH Common" --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/rh-common/os
 #repo --name="CentOS-7 - CERNONLY" --baseurl http://linuxsoft.cern.ch/cern/centos/7/cernonly/x86_64/
 
 text
@@ -63,9 +69,22 @@ part / --fstype="xfs" --ondisk=vda --size=6144
 
 %post --erroronfail
 
+# redirect the output to the log file
+exec >/root/anaconda-post.log 2>&1
+
+# show the output on the seventh console
+tail -f /root/anaconda-post.log >/dev/tty7 &
+
+wget http://cern.ch/linux/rhel/repofiles/rhel7.repo -O /etc/yum.repos.d/rhel.repo
+
 # Update the machine
-/usr/bin/yum update -y --skip-broken || :
-/usr/bin/yum install -y cloud-init cloud-utils-growpart || :
+echo "Updating the RPMs"
+/usr/bin/yum update -y --skip-broken --disableplugin=subscription-manager || :
+
+## Install cloud-init
+#echo "Installing cloud-init"
+#/usr/bin/yum install -y cloud-init           --enablerepo=rhel-7-server-rh-common-rpms --disableplugin=subscription-manager || :
+#/usr/bin/yum install -y cloud-utils-growpart --enablerepo=* --disableplugin=subscription-manager || :
 
 # workaround anaconda requirements
 passwd -d root
@@ -101,11 +120,11 @@ echo .
 
 # this is installed by default but we don't need it in virt
 echo "Removing linux-firmware package."
-yum -C -y remove linux-firmware
+yum -C -y remove linux-firmware --disableplugin=subscription-manager
 
 # Remove firewalld; it is required to be present for install/image building.
 echo "Removing firewalld."
-yum -C -y remove firewalld --setopt="clean_requirements_on_remove=1"
+yum -C -y remove firewalld --setopt="clean_requirements_on_remove=1" --disableplugin=subscription-manager
 
 echo -n "Getty fixes"
 # although we want console output going to the serial console, we don't
@@ -194,7 +213,7 @@ fi
 #sed -i 's|^enabled=1|enabled=0|' /etc/yum/pluginconf.d/subscription-manager.conf
 
 echo "Cleaning old yum repodata."
-yum clean all
+yum clean all --disableplugin=subscription-manager
 
 # clean up installation logs
 rm -rf /var/log/yum.log
@@ -208,7 +227,7 @@ echo "Fixing SELinux contexts."
 touch /var/log/cron
 touch /var/log/boot.log
 mkdir -p /var/cache/yum
-/usr/sbin/fixfiles -R -a restore
+/usr/sbin/fixfiles -R -a restore || :
 
 ## reorder console entries
 #sed -i 's/console=tty0/console=tty0 console=ttyS0,115200n8/' /boot/grub2/grub.cfg
@@ -256,6 +275,7 @@ yum-utils
 -libertas-usb8388-firmware
 -plymouth
 cloud-init
-cloud-utils-growpart
+###cloud-utils-growpart
+wget
 %end
 
