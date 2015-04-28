@@ -15,9 +15,6 @@
     <url>http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/extras/os</url>
   </repository>
  </repositories>
-# <packages>
-#  <package name='heat-cfntools'/>
-# </packages>
  <commands>
   <command name='fixes'>
 #
