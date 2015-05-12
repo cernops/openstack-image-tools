@@ -1,7 +1,7 @@
 install
 
 # installation path, additional repositories
-url --url http://linuxsoft.cern.ch/enterprise/5Server_U11/en/os/x86_64
+url --url http://linuxsoft.cern.ch/enterprise/rhel/server/5/5.11/x86_64/
 
 repo --name="EPEL"            --baseurl http://linuxsoft.cern.ch/epel/5/x86_64
 repo --name="RHEL - updates"  --baseurl http://linuxsoft.cern.ch/rhel/rhel5server-x86_64/RPMS.updates/

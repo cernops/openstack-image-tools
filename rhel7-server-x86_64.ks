@@ -5,7 +5,7 @@ auth --enableshadow --passalgo=sha512
 reboot
 
 # installation path, additional repositories
-url --url http://linuxsoft.cern.ch/enterprise/7Server_U1/en/os/x86_64
+url --url http://linuxsoft.cern.ch/enterprise/rhel/server/7/7.1/x86_64/
 
 # Use network installation
 repo --name="extras"         --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/extras/os

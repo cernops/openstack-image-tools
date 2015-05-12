@@ -1,7 +1,7 @@
 install
 
 # installation path, additional repositories
-url --url http://linuxsoft.cern.ch/enterprise/6Server_U6/en/os/x86_64
+url --url http://linuxsoft.cern.ch/enterprise/rhel/server/6/6.6/x86_64/
 
 repo --name="EPEL"             --baseurl http://linuxsoft.cern.ch/epel/6/x86_64
 repo --name="RHEL - optional"  --baseurl http://linuxsoft.cern.ch/rhel/rhel6server-x86_64/RPMS.optional/
