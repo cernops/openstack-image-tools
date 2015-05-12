@@ -3,7 +3,7 @@
  <description>CC7 Extra with Cern-additions: AFS, Kerberos, user accounts, ...</description>
  <os>
   <name>CentOS-7</name>
-  <version>0</version>
+  <version>1</version>
   <arch>x86_64</arch>
   <install type='url'>
     <url>http://linuxsoft.cern.ch/cern/centos/7/os/x86_64/</url>
