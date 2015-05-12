@@ -6,7 +6,7 @@
   <version>U11</version>
   <arch>x86_64</arch>
   <install type='url'>
-    <url>http://linuxsoft.cern.ch/enterprise/5Server_U11/en/os/x86_64</url>
+    <url>http://linuxsoft.cern.ch/enterprise/rhel/server/5/5.11/x86_64/</url>
   </install>
  </os>
  <repositories>

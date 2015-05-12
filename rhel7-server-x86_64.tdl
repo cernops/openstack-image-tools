@@ -6,7 +6,7 @@
   <version>7</version>
   <arch>x86_64</arch>
   <install type='url'>
-    <url>http://linuxsoft.cern.ch/enterprise/7Server_U1/en/os/x86_64</url>
+    <url>http://linuxsoft.cern.ch/enterprise/rhel/server/7/7.1/x86_64/</url>
   </install>
   <kernelparam>inst.geoloc=0</kernelparam>
  </os>
