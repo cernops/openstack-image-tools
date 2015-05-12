@@ -4,9 +4,9 @@ install
 url --url http://linuxsoft.cern.ch/enterprise/rhel/server/6/6.6/x86_64/
 
 repo --name="EPEL"             --baseurl http://linuxsoft.cern.ch/epel/6/x86_64
-repo --name="RHEL - optional"  --baseurl http://linuxsoft.cern.ch/rhel/rhel6server-x86_64/RPMS.optional/
-repo --name="RHEL - updates"   --baseurl http://linuxsoft.cern.ch/rhel/rhel6server-x86_64/RPMS.updates/
-repo --name="RHEL - fastrack"  --baseurl http://linuxsoft.cern.ch/rhel/rhel6server-x86_64/RPMS.fastrack/
+repo --name="RHEL - optional"  --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/6/6Server/x86_64/optional/os
+#repo --name="RHEL - updates"   --baseurl http://linuxsoft.cern.ch/rhel/rhel6server-x86_64/RPMS.updates/
+repo --name="RHEL - fastrack"  --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/fastrack/rhel/server/6/x86_64/os
 
 text
 key --skip

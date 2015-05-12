@@ -4,8 +4,8 @@ install
 url --url http://linuxsoft.cern.ch/enterprise/rhel/server/5/5.11/x86_64/
 
 repo --name="EPEL"            --baseurl http://linuxsoft.cern.ch/epel/5/x86_64
-repo --name="RHEL - updates"  --baseurl http://linuxsoft.cern.ch/rhel/rhel5server-x86_64/RPMS.updates/
-repo --name="RHEL - fastrack" --baseurl http://linuxsoft.cern.ch/rhel/rhel5server-x86_64/RPMS.fastrack/
+#repo --name="RHEL - updates"  --baseurl http://linuxsoft.cern.ch/rhel/rhel5server-x86_64/RPMS.updates/
+repo --name="RHEL - fastrack" --baseurl http://linuxsoft.cern.ch/cdn.redhat.com/content/fastrack/rhel/server/5/x86_64/os
 
 text
 
