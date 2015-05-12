@@ -5,8 +5,8 @@
   <name>SLC-5</name>
   <version>U11</version>
   <arch>x86_64</arch>
-  <install type='iso'>
-    <iso>http://linuxsoft.cern.ch/cern/slc511/iso/SLC_5.11_x86_64_dvd.iso</iso>
+  <install type='url'>
+    <url>http://linuxsoft.cern.ch/cern/slc5X/x86_64/</url>
   </install>
  </os>
  <packages>

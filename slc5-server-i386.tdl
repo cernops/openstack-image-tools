@@ -5,8 +5,8 @@
   <name>SLC-5</name>
   <version>U11</version>
   <arch>i386</arch>
-  <install type='iso'>
-    <iso>http://linuxsoft.cern.ch/cern/slc511/iso/SLC_5.11_i386_dvd.iso</iso>
+  <install type='url'>
+    <url>http://linuxsoft.cern.ch/cern/slc5X/i386/</url>
   </install>
  </os>
  <packages>
