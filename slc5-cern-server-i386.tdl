@@ -6,7 +6,7 @@
   <version>U11</version>
   <arch>i386</arch>
   <install type='url'>
-    <url>http://linuxsoft.cern.ch/cern/slc5X/x86_64/</url>
+    <url>http://linuxsoft.cern.ch/cern/slc5X/i386/</url>
   </install>
  </os>
  <packages>
