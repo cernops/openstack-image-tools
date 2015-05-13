@@ -13,9 +13,6 @@
   <repository name='epel-5'>
    <url>http://linuxsoft.cern.ch/epel/5/x86_64</url>
   </repository>
-  <repository name='rhel5-updates'>
-   <url>http://linuxsoft.cern.ch/rhel/rhel5server-x86_64/RPMS.updates/</url>
-  </repository>
  </repositories>
  <packages>
   <package name='cloud-init'/>
