@@ -13,6 +13,9 @@
   <repository name='epel-5'>
    <url>http://linuxsoft.cern.ch/epel/5/x86_64</url>
   </repository>
+  <repository name='rhel-5'>
+   <url>http://linuxsoft.cern.ch/cdn.redhat.com/content/dist/rhel/server/5/5Server/x86_64/os</url>
+  </repository>
  </repositories>
  <packages>
   <package name='cloud-init'/>
