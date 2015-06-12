@@ -12,6 +12,9 @@
  </os>
  <commands>
   <command name='fixes'>
+
+/usr/bin/yum install -y centos-release-openstack
+
 #
 # de-Quattorize
 #
@@ -30,7 +33,7 @@
 #
 # Install heat-cfntools
 #
-/usr/bin/yum install heat-cfntools -y || :
+/usr/bin/yum install heat-cfntools -y
 
 #
 # Enable DHCPv6 for eth0

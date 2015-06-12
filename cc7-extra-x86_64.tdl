@@ -15,15 +15,11 @@
 
 exec >>/root/customize.log 2>&amp;1
 
-/usr/bin/yum groupinstall 'CERN Base Tools' -y
+/usr/bin/yum groupinstall cern-openafs-client 'CERN Base Tools' -y
 
-/bin/rpm -qa kernel* --queryformat "%{version}_%{release}\n" | /bin/sort | /usr/bin/uniq | /usr/bin/xargs -n1 -i{} /usr/bin/yum install kmod-openafs-*.{} -y
-
-/usr/bin/yum install -y cern-config-users openafs-client cern-wrappers phonebook hepix cern-private-cloud-addons krb5-workstation
+/usr/bin/yum install -y cern-config-users cern-wrappers phonebook hepix cern-private-cloud-addons krb5-workstation centos-release-openstack ntp
 
 /usr/bin/systemctl enable openafs-client.service
-
-/usr/bin/yum install -y ntp # necessary to make ncm-srvtab work
 
 /usr/bin/yum erase lcm-profile -y # remove from image, let instance put it back *with correct link for /usr/share/lcm/profile_standalone.xml*
 
