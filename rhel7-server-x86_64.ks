@@ -246,6 +246,7 @@ rsync
 tar
 yum-utils
 -NetworkManager
+-NetworkManager-team
 -NetworkManager-tui
 -aic94xx-firmware
 -alsa-firmware
