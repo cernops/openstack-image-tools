@@ -46,6 +46,9 @@ reboot
 %packages
 @core
 @base
+-NetworkManager
+-NetworkManager-team
+-NetworkManager-tui
 yum-protectbase
 yum-priorities
 yum-kernel-module
