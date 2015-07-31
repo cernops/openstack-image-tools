@@ -45,6 +45,9 @@ reboot
 @core
 @base
 -yum-autoupdate
+-NetworkManager
+-NetworkManager-team
+-NetworkManager-tui
 yum-protectbase
 yum-priorities
 python-hashlib
