@@ -1,12 +1,12 @@
 <template>
- <name>SLC6 Server - x86_64</name>
- <description>SLC6 Server - x86_64</description>
+ <name>SLC6 Base - x86_64</name>
+ <description>SLC6 Base - x86_64</description>
  <os>
   <name>SLC-6</name>
-  <version>6</version>
+  <version>7</version>
   <arch>x86_64</arch>
   <install type='url'>
-    <url>http://linuxsoft.cern.ch/cern/slc66/x86_64/</url>
+    <url>http://linuxsoft.cern.ch/cern/slc6X/x86_64/</url>
   </install>
  </os>
  <packages>

@@ -1,12 +1,12 @@
 <template>
- <name>SLC6 Server - i686</name>
- <description>SLC6 Server - i686</description>
+ <name>SLC6 Extra - i686</name>
+ <description>SLC6 Server with Cern-additions: AFS, Kerberos, user accounts, ...</description>
  <os>
   <name>SLC-6</name>
-  <version>6</version>
+  <version>7</version>
   <arch>i386</arch>
   <install type='url'>
-    <url>http://linuxsoft.cern.ch/cern/slc66/i386/</url>
+    <url>http://linuxsoft.cern.ch/cern/slc6X/i386/</url>
   </install>
  </os>
  <packages>
@@ -24,6 +24,13 @@ exec >>/root/customize.log 2>&amp;1
   <command name='tuned'>
 exec >>/root/customize.log 2>&amp;1
 /usr/bin/tuned-adm profile virtual-guest || :
+  </command>
+  <command name='cern-private-cloud-addons'>
+exec >>/root/customize.log 2>&amp;1
+/bin/rpm -qa kernel* --queryformat "%{version}-%{release}\n" | /bin/sort | /usr/bin/uniq | /usr/bin/xargs -n1 -i{} /usr/bin/yum install -y kernel-module-openafs-{}
+/usr/bin/yum install -y cern-config-users openafs-client cern-wrappers phonebook hepix cern-private-cloud-addons krb5-workstation
+/sbin/chkconfig --level 345 afs on
+:
   </command>
   <command name='de-contextualize'>
 exec >>/root/customize.log 2>&amp;1

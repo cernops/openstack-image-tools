@@ -1,12 +1,12 @@
 install
 
 # installation path, additional repositories
-url --url http://linuxsoft.cern.ch/cern/slc66/i386/
+url --url http://linuxsoft.cern.ch/cern/slc6X/i386/
 
 repo --name="EPEL"             --baseurl http://linuxsoft.cern.ch/epel/6/i386
-repo --name="SLC6 - updates"   --baseurl http://linuxsoft.cern.ch/cern/slc66/i386/yum/updates/
-repo --name="SLC6 - extras"    --baseurl http://linuxsoft.cern.ch/cern/slc66/i386/yum/extras/
-#repo --name="SLC6 - cernonly"  --baseurl http://linuxsoft.cern.ch/onlycern/slc66/i386/yum/cernonly/
+repo --name="SLC6 - updates"   --baseurl http://linuxsoft.cern.ch/cern/slc6X/i386/yum/updates/
+repo --name="SLC6 - extras"    --baseurl http://linuxsoft.cern.ch/cern/slc6X/i386/yum/extras/
+#repo --name="SLC6 - cernonly"  --baseurl http://linuxsoft.cern.ch/onlycern/slc6X/i386/yum/cernonly/
 
 text
 key --skip
@@ -52,7 +52,6 @@ reboot
 %packages
 @ Server Platform
 pam_krb5
--yum-autoupdate
 yum-plugin-priorities
 -fprintd
 %end
