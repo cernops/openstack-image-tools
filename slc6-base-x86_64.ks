@@ -1,12 +1,12 @@
 install
 
 # installation path, additional repositories
-url --url http://linuxsoft.cern.ch/cern/SLC6X/x86_64/
+url --url http://linuxsoft.cern.ch/cern/slc6X/x86_64/
 
 repo --name="EPEL"             --baseurl http://linuxsoft.cern.ch/epel/6/x86_64
-repo --name="SLC6 - updates"   --baseurl http://linuxsoft.cern.ch/cern/SLC6X/x86_64/yum/updates/
-repo --name="SLC6 - extras"    --baseurl http://linuxsoft.cern.ch/cern/SLC6X/x86_64/yum/extras/
-#repo --name="SLC6 - cernonly"  --baseurl http://linuxsoft.cern.ch/onlycern/SLC6X/x86_64/yum/cernonly/
+repo --name="SLC6 - updates"   --baseurl http://linuxsoft.cern.ch/cern/slc6X/x86_64/yum/updates/
+repo --name="SLC6 - extras"    --baseurl http://linuxsoft.cern.ch/cern/slc6X/x86_64/yum/extras/
+#repo --name="SLC6 - cernonly"  --baseurl http://linuxsoft.cern.ch/onlycern/slc6X/x86_64/yum/cernonly/
 
 text
 key --skip
