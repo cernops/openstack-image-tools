@@ -134,7 +134,7 @@ ONBOOT="yes"
 TYPE="Ethernet"
 USERCTL="yes"
 PEERDNS="yes"
-IPV6INIT="no"
+IPV6INIT="yes"
 PERSISTENT_DHCLIENT="1"
 EOF
 
