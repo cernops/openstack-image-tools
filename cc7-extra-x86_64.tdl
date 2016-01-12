@@ -24,11 +24,6 @@ exec >>/root/customize.log 2>&amp;1
 /usr/bin/yum erase lcm-profile -y # remove from image, let instance put it back *with correct link for /usr/share/lcm/profile_standalone.xml*
 
 #
-# Quiesce logrotate (BZ 1144465)
-#
-/bin/sed -i 's|sharedscripts|sharedscripts\n    missingok|' /etc/logrotate.d/syslog
-
-#
 # Install heat-cfntools
 #
 /usr/bin/yum install heat-cfntools -y || :
