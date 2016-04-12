@@ -217,7 +217,7 @@ yum clean all --disableplugin=subscription-manager
 
 # clean up installation logs
 rm -rf /var/log/yum.log
-rm -rf /var/lib/yum/* 
+rm -rf /var/lib/yum/*
 rm -rf /root/install.log
 rm -rf /root/install.log.syslog
 rm -rf /root/anaconda-ks.cfg
@@ -275,7 +275,7 @@ yum-utils
 -libertas-sd8787-firmware
 -libertas-usb8388-firmware
 -plymouth
-cloud-init
+###cloud-init
 ###cloud-utils-growpart
 wget
 %end
