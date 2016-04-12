@@ -22,6 +22,13 @@
 #
 echo DHCPV6C=\"yes\" >> /etc/sysconfig/network-scripts/ifcfg-eth0
 
-  </command>
+
+/usr/bin/yum install -y cloud-init --enablerepo=* --disableplugin=subscription-manager || :
+ 
+if [ -e /etc/cloud/cloud.cfg ]; then                                          
+    /bin/sed -i 's|^disable_root: 1|disable_root: 0|' /etc/cloud/cloud.cfg    
+fi                                                                            
+
+   </command>
  </commands>
 </template>
